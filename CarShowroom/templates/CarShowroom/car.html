@@ -1,0 +1,273 @@
+{% extends 'CarShowroom/base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="car-container">
+
+    <div class="object">
+        <model-viewer src="{{ car.object_file.url }}" alt="Model samochodu" auto-rotate rotation-per-second="30deg"
+            camera-controls ar>
+        </model-viewer>
+    </div>
+
+
+    <div class="information">
+        <h1>
+            {{ car.brand }}
+        </h1>
+        <h2>
+            {{ car.model }}
+        </h2>
+        <p>
+            {{ car.text|safe }}
+        </p>
+    </div>
+
+    <div class="buttons">
+        <a href="#description">
+            <div class="info-btn">
+                OPIS POJAZDU
+            </div>
+        </a>
+        <a href="#config">
+            <div class="config-btn">
+                KONFIGURACJA
+            </div>
+        </a>
+        <a href="#reserve">
+            <div class="reserve-btn">
+                UMÓW JAZDĘ PRÓBNĄ
+            </div>
+        </a>
+    </div>
+
+    <div class="anchor anchor-desc" id="description">a</div>
+
+    <div class="description">
+        <h1>{{ car }}</h1>
+
+        {% for image in images %}
+        <hr>
+        {% if image.id|divisibleby:2 %}
+        <div class="description-box">
+            <div class="description-text">
+                {{ image.text|safe }}
+            </div>
+            <div class="description-img">
+                <img src="{{ image.image.url }}" alt="img" srcset="">
+            </div>
+        </div>
+        {% else %}
+        <div class="description-box">
+            <div class="description-img">
+                <img src="{{ image.image.url }}" alt="img" srcset="">
+            </div>
+            <div class="description-text">
+                {{ image.text|safe }}
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+
+    <div class="anchor" id="config">a</div>
+
+    <div class="config">
+        <h1>KONFIGURACJA</h1>
+
+        <div class="list-box">
+
+            <ul class="list">
+                {% for equipment in equipments %}
+                <li class="item">
+                    <div class="eq">
+                        <div class="eq-box">
+                            <div class="eq-img">
+                                <img src="{{ equipment.image.url }}" alt="" srcset="">
+                            </div>
+                        </div>
+                        <div class="eq-box eq-middle">
+                            <div class="eq-name">
+                                <h4>
+                                    {{ equipment.name }}
+                                </h4>
+                            </div>
+                            <hr>
+                            <div class="eq-txt">
+                                {{ equipment.text }}
+                            </div>
+                            <hr>
+                            <div class="eq-price">
+                                <h5>
+                                    {{ equipment.price }} ZŁ
+                                </h5>
+                            </div>
+                        </div>
+                        <div class="eq-box">
+                            <div class="eq-add">
+                                <img src="{% static 'images/plus.png' %}" alt="ADD" srcset="" style="max-width: 30px;">
+
+                                <img src="{% static 'images/minus.png' %}" alt="REMOVE" srcset=""
+                                    style="max-width: 30px; display: none;">
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            <button onclick="Move('previous')" class="button-previous"> <img src="{% static 'images/arrow.png' %}"
+                    style="max-width: 30px;"></button>
+            <button onclick="Move('next')" class="button-next"><img src="{% static 'images/right-arrow.png' %}"
+                    style="max-width: 30px;"></button>
+        </div>
+
+        <div class="full-price">
+            <h3>
+                Cena tego auta w tej konfiguracji wynosi:
+            </h3>
+            <h3 id="price">
+                0,0 ZŁ
+            </h3>
+        </div>
+
+    </div>
+
+    <div class="anchor" id="reserve">a</div>
+
+    <div class="reserve-form">
+        <h1>UMÓW JAZDĘ PRÓBNĄ</h1>
+        <form method="post" action="">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Zarezerwuj</button>
+            {% if form.errors %}
+            <ul class="errors">
+                {% for field in form %}
+                {% for error in field.errors %}
+                <li>{{ field.label }}: {{ error }}</li>
+                {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>
+                    {{ message }}
+                    </li>
+                    {% endfor %}
+            </ul>
+            {% endif %}
+        </form>
+    </div>
+
+</div>
+
+<script>
+    const date_input = document.querySelector('#id_date');
+    const time_input = document.querySelector('#id_time');
+    const car_id = "{{ car.id }}";
+
+    const placeholder = document.createElement('option');
+    placeholder.textContent = 'Najpierw wybierz datę';
+    placeholder.value = '';
+    time_input.appendChild(placeholder);
+
+    date_input.addEventListener('change', function () {
+        const selected_date = this.value;
+        console.log(selected_date);
+        if (!selected_date) return;
+
+        fetch(`/ajax/get-times/?car_id=${car_id}&date=${selected_date}`)
+            .then(response => response.json())
+            .then(data => {
+                time_input.innerHTML = '';
+
+                if (data.times && data.times.length > 0) {
+                    data.times.forEach(time => {
+                        const option = document.createElement('option');
+                        option.value = time;
+                        option.textContent = time;
+                        time_input.appendChild(option);
+                    });
+                } else {
+                    const option = document.createElement('option');
+                    option.textContent = 'Brak dostępnych godzin na ten dzień';
+                    option.value = '';
+                    time_input.appendChild(option);
+                }
+            })
+            .catch(error => {
+                console.error('Błąd: ', error);
+            });
+    });
+
+    /////////////////////////////////////////////
+
+    const eq_list = document.querySelector('.list');
+    const item = document.querySelector('.item');
+    const itemWidth = item.offsetWidth;
+
+    function Move(direction) {
+        if (direction === 'previous') {
+            eq_list.scrollBy({ left: -itemWidth, behavior: "smooth" });
+        } else {
+            eq_list.scrollBy({ left: itemWidth, behavior: "smooth" });
+        }
+    }
+
+    ///////////////////////////////////////////
+
+    const base_price = {{ car.base_price| safe }};
+    obj_price = document.getElementById('price');
+    let list = [];
+
+    let full_price = base_price;
+
+    document.querySelectorAll('.eq').forEach(eqCard => {
+
+        const name = eqCard.querySelector('.eq-name h4').textContent.trim();
+        const priceText = eqCard.querySelector('.eq-price h5').textContent.trim().replace('ZŁ', '').replace(',', '.');
+        const price = parseFloat(priceText);
+
+        let id = list.indexOf(name);
+
+        let plus = eqCard.querySelector("img[alt='ADD']");
+        let minus = eqCard.querySelector("img[alt='REMOVE']");
+
+        [plus, minus].forEach(button => {
+            button.addEventListener('click', () => {
+                const isAdded = list.includes(name);
+
+                if (isAdded) {
+                    list = list.filter(item => item !== name);
+                    full_price -= price;
+                    eqCard.style.border = '1px solid #000'
+                    plus.style.display = 'inline';
+                    minus.style.display = 'none';
+                } else {
+                    list.push(name);
+                    full_price += price;
+                    eqCard.style.border = '1px solid #00A19B'
+                    plus.style.display = 'none';
+                    minus.style.display = 'inline';
+                }
+
+                console.log('Wybrano:', list);
+                show(full_price);
+            });
+        });
+    });
+
+
+    function show(price) {
+        obj_price.textContent = price.toFixed(2) + ' ZŁ';
+    }
+
+    window.onload = show(base_price);
+</script>
+
+{% endblock %}

@@ -1,0 +1,49 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CarShowroom</title>
+
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.2.0/model-viewer.min.js"></script>
+    <link rel="icon" href="{% static 'images/logo.png' %}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'css/CarShowroom.css' %}">
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <a href="{% url 'main' %}">
+                    <div class="logo-img">
+                        <img src="{% static 'images/icon.png' %}" alt="icon" srcset="">
+                    </div>
+                    <div class="logo-txt">
+                        <h1>MERCEDES</h1>
+                    </div>
+                </a>
+            </div>
+            {% if request.resolver_match.view_name == 'main' %}
+
+            <div class="menu">
+                <a href="#car-separator">Nasze samochody</a>
+                <a href="#contact-separator">Kontakt</a>
+            </div>
+
+            {% endif %}
+
+        </div>
+        {% block content %}
+        {% endblock %}
+
+        <div class="footer">
+            <h6>
+                Strona została wykonana przez: Mariusza Bienasz
+            </h6>
+        </div>
+    </div>
+</body>
+
+</html>

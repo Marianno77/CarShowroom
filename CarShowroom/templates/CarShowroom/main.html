@@ -1,0 +1,235 @@
+{% extends 'CarShowroom/base.html' %}
+{% load static %}
+{% block content %}
+
+
+<div class="baner">
+    <img src="{% static 'images/baner1.png' %}" alt="BANER" srcset="" id="b1">
+</div>
+
+
+<div class="counters-holder" id="paralax">
+    <div class="separator">
+        <h2>Zdecydowali się na nas</h2>
+    </div>
+
+    <div class="counters">
+        <div class="count">
+            <div class="icon">
+                <img src="{% static 'images/visit.png' %}" alt="">
+            </div>
+            <div class="text">
+                Odwiedziło nas już:
+                <p id="c1">
+                    {{ count_visit }}
+                </p>
+                <p id="visit_label">
+                    osoby
+                </p>
+            </div>
+        </div>
+
+        <div class="count">
+            <div class="icon">
+                <img src="{% static 'images/buy.png' %}" alt="">
+            </div>
+            <div class="text">
+                Sprzedaliśmy już:
+                <p id="c2">
+                    123
+                </p>
+                <p id="buy_label">
+                    pojazdów
+                </p>
+            </div>
+        </div>
+
+        <div class="count">
+            <div class="icon">
+                <img src="{% static 'images/reserve.png' %}" alt="">
+            </div>
+            <div class="text">
+                Już tyle osób:
+                <p id="c3">
+                    {{ count_reserve }}
+                </p>
+                umówiło jazdę próbną
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="anchor" id="car-separator">a</div>
+
+<div class="separator">
+    <h2>Nasze samochody</h2>
+</div>
+
+<div class="cars">
+    {% for car in cars %}
+    <a href="{{ car.get_absolute_url }}">
+        <div class="car_holder">
+            <div class="car-img" style="background-image: url('{{ car.image.url }}');">
+                <img src="{{ car.image.url }}" alt="" srcset="">
+            </div>
+            <div class="info">
+                <div class="brand">
+                    <h3>
+                        {{ car.brand }}
+                    </h3>
+                    <h5>
+                        {{ car.model }}
+                    </h5>
+                </div>
+
+                <div class="fuel">
+                    Rodzaje paliwa: <br />
+                    {{ car.fuel_type }}
+                </div>
+                <div>
+                    <h4>
+                        Już od <br /> {{ car.base_price }} zł
+                    </h4>
+                </div>
+            </div>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+
+<div class="anchor" id="contact-separator">a</div>
+
+<div class="separator">
+    <h2>Napisz do nas</h2>
+</div>
+
+<div class="contact">
+    <div class="reserve-form">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Wyślij</button>
+        </form>
+    </div>
+
+</div>
+
+<div class="separator">
+    <h2>Znajdziesz nas tutaj</h2>
+</div>
+
+<div class="map">
+    <iframe
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d91671.25918726315!2d23.074092138508743!3d53.127672464160106!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x471ffc048f41971d%3A0x72317dcc8bf07b2c!2sBia%C5%82ystok!5e1!3m2!1spl!2spl!4v1744391069273!5m2!1spl!2spl"
+        width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade">
+    </iframe>
+</div>
+<div class="contact-plus">
+    <div class="contact-box">
+        <img src="{% static 'images/telephone.png' %}" alt="" style="max-width: 25px;">
+        <p>
+            Telefon: 123456789
+        </p>
+    </div>
+    <div class="contact-box">
+        <img src="{% static 'images/email.png' %}" alt="" style="max-width: 25px;">
+        <p>
+            Email: email@email.com
+        </p>
+    </div>
+</div>
+
+<script>
+    function animate(obj, target_value, duration) {
+        let startTime = null
+
+        function update(timestamp) {
+            if (!startTime) startTime = timestamp;
+            let progress = timestamp - startTime;
+            let value = Math.min(Math.floor((progress / duration) * target_value), target_value);
+            obj.textContent = value;
+
+            if (value < target_value) {
+                requestAnimationFrame(update);
+            }
+        }
+
+        requestAnimationFrame(update);
+    }
+
+    function start_animate() {
+        obj_visit = document.getElementById('c1');
+        target_value_visit = obj_visit.textContent;
+        const visit_label = document.getElementById('visit_label')
+
+        obj_buy = document.getElementById('c2');
+        target_value_buy = obj_buy.textContent;
+        const buy_label = document.getElementById('buy_label')
+
+        obj_reserve = document.getElementById('c3');
+        target_value_reserve = obj_reserve.textContent;
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    if (entry.target == obj_visit) {
+                        animate(obj_visit, target_value_visit, 3000);
+                        if (target_value_visit == 1) {
+                            visit_label.textContent = 'osoba';
+                        } else if (target_value_visit % 10 <= 4 && target_value_visit % 10 > 1) {
+                            visit_label.textContent = 'osoby';
+                        } else {
+                            visit_label.textContent = 'osób';
+                        }
+                    }
+                    if (entry.target == obj_buy) {
+                        animate(obj_buy, target_value_buy, 3000)
+                        if (target_value_buy == 1) {
+                            buy_label.textContent = 'pojazd';
+                        } else if (target_value_buy % 10 <= 4 && target_value_buy % 10 > 1) {
+                            buy_label.textContent = 'pojazdy';
+                        } else {
+                            buy_label.textContent = 'pojazdów';
+                        }
+                    }
+                    if (entry.target == obj_reserve) {
+                        animate(obj_reserve, target_value_reserve, 3000)
+                    }
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.85 });
+
+        observer.observe(obj_visit);
+        observer.observe(obj_buy);
+        observer.observe(obj_reserve);
+
+        obj_car = document.querySelectorAll('.car_holder');
+
+        const observer_two = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    if (entry.target.classList.contains('car_holder')) {
+                        const info = entry.target.querySelector('.info');
+                        info.classList.add('info-show');
+                    }
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.4 });
+
+        obj_car.forEach(car => {
+            observer_two.observe(car);
+        })
+    }
+
+
+    window.onload = start_animate;
+
+
+
+</script>
+
+
+{% endblock %}
