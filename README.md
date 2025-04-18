@@ -31,6 +31,17 @@ Projekt przedstawia nowoczesną stronę internetową marki **Mercedes**, zaproje
 
 ---
 
+![image](https://github.com/user-attachments/assets/b84cf37f-3556-4528-bf79-92f50a52be53)
+
+
+![image](https://github.com/user-attachments/assets/e70d89f0-d8ac-4c2f-beda-b247c9c2bd55)
+
+
+![image](https://github.com/user-attachments/assets/4cbf89ba-79dc-437d-a705-467212479c18)
+
+---
+
+
 ## README – Mercedes Website
 
 ### Project Description
@@ -60,3 +71,15 @@ This project presents a modern, elegant website for the **Mercedes** brand, desi
 3. **Configurator** – Car customization options  
 4. **Contact** – Contact form and map with dealership location  
 5. **Test Drive** – Form to schedule a test drive
+
+---
+
+![image](https://github.com/user-attachments/assets/acab27d8-bdff-444f-959a-d3b29e742fa4)
+
+
+![image](https://github.com/user-attachments/assets/b9c76467-fcac-4b30-9d74-98a36f36d555)
+
+
+![image](https://github.com/user-attachments/assets/31c1d850-1d2b-4d11-81ad-5ca4a56d8c66)
+
+---
